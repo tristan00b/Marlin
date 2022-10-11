@@ -189,6 +189,13 @@
   #define E1_CS_PIN                        P1_01
 #endif
 
+#define Z2_STEP_PIN                        P1_15
+#define Z2_DIR_PIN                         P1_14
+#define Z2_ENABLE_PIN                      P1_16
+#ifndef Z2_CS_PIN
+  #define Z2_CS_PIN                        P1_01
+#endif
+
 #define TEMP_1_PIN                      P0_23_A0  // A0 (T0) - (67) - TEMP_1_PIN
 #define TEMP_BED_PIN                    P0_25_A2  // A2 (T2) - (69) - TEMP_BED_PIN
 
@@ -240,6 +247,9 @@
 
   #define E1_SERIAL_TX_PIN                 P1_01
   #define E1_SERIAL_RX_PIN      E1_SERIAL_TX_PIN
+
+  #define Z2_SERIAL_TX_PIN                 P1_01
+  #define Z2_SERIAL_RX_PIN      Z2_SERIAL_TX_PIN
 
   // Reduce baud rate to improve software serial reliability
   #define TMC_BAUD_RATE                    19200
