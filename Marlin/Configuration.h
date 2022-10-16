@@ -120,7 +120,7 @@
  * Currently Ethernet (-2) is only supported on Teensy 4.1 boards.
  * :[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-//#define SERIAL_PORT_2 -1
+#define SERIAL_PORT_2 -1
 //#define BAUDRATE_2 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE
 
 /**
@@ -181,7 +181,17 @@
 //#define E6_DRIVER_TYPE A4988
 //#define E7_DRIVER_TYPE A4988
 
-#define DIAG_PINS_REMOVED // silences warning; yes, diag pins have been removed
+// Manually configure Z2 pins to prevent Marlin from autoconfiguring them (tristan00b)
+#define Z2_SERIAL_TX_PIN E1_SERIAL_TX_PIN
+#define Z2_SERIAL_RX_PIN E1_SERIAL_RX_PIN
+
+#define Z2_STEP_PIN      E1_STEP_PIN
+#define Z2_DIR_PIN       E1_DIR_PIN
+#define Z2_ENABLE_PIN    E1_ENABLE_PIN
+#define Z2_CS_PIN        E1_CS_PIN
+
+// Silence warning; diag pins have been physically removed (tristan00b)
+#define DIAG_PINS_REMOVED
 
 /**
  * Additional Axis Settings
@@ -537,7 +547,7 @@
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  *
  */
-#define TEMP_SENSOR_0 1
+#define TEMP_SENSOR_0 5
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
@@ -616,7 +626,7 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
-#define HEATER_0_MAXTEMP 275
+#define HEATER_0_MAXTEMP 300 // Max user settable temp is 285 deg (= 300 deg - 15 deg), a safety feature built into Marlin.
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
@@ -664,9 +674,9 @@
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
   #else
-    #define DEFAULT_Kp 14.58
-    #define DEFAULT_Ki  1.14
-    #define DEFAULT_Kd 46.57
+    #define DEFAULT_Kp  22.20
+    #define DEFAULT_Ki   1.08
+    #define DEFAULT_Kd 114.00
   #endif
 #endif
 
@@ -1033,7 +1043,7 @@
 // extra connectors. Leave undefined any used for non-endstop and non-probe purposes.
 #define USE_XMIN_PLUG
 #define USE_YMIN_PLUG
-#define USE_ZMIN_PLUG
+// #define USE_ZMIN_PLUG // Physically removed
 //#define USE_IMIN_PLUG
 //#define USE_JMIN_PLUG
 //#define USE_KMIN_PLUG
@@ -1167,7 +1177,7 @@
  * Override with M92
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80.121, 80.121, 399.778, 449.58 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80.121, 80.121, 399.778, 409 }
 
 /**
  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
@@ -1294,7 +1304,8 @@
  *      - normally-open switches to 5V and D32.
  */
 
-// Z_MIN_PROBE_PIN for the SKR V1.4 Turbo is defined in Marlin/src/pins/lpc1768/pins_BTT_SKR_V1_4.h
+// Z_MIN_PROBE_PIN for the SKR V1.4 Turbo is already defined in
+// src/pins/lpc1768/pins_BTT_SKR_V1_4.h (tristan00b)
 //#define Z_MIN_PROBE_PIN 32 // Pin 32 is the RAMPS default
 
 /**
@@ -1484,17 +1495,17 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { 28, -33, 3 }
+#define NOZZLE_TO_PROBE_OFFSET { -5, 25, -1.8 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define PROBING_MARGIN 20
+#define PROBING_MARGIN 10
 
 // X and Y axis travel speed (mm/min) between probes
-#define XY_PROBE_FEEDRATE (60*60)
+#define XY_PROBE_FEEDRATE (133*60)
 
 // Feedrate (mm/min) for the first approach when double-probing (MULTIPLE_PROBING == 2)
-#define Z_PROBE_FEEDRATE_FAST (12*60)
+#define Z_PROBE_FEEDRATE_FAST (20*60)
 
 // Feedrate (mm/min) for the "accurate" probe of each point
 #define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST / 2)
@@ -1695,15 +1706,15 @@
 // @section geometry
 
 // The size of the printable area
-#define X_BED_SIZE 300
-#define Y_BED_SIZE 300
+#define X_BED_SIZE 305
+#define Y_BED_SIZE 305
 
 // Travel limits (linear=mm, rotational=°) after homing, corresponding to endstop positions.
-#define X_MIN_POS -3
+#define X_MIN_POS -1
 #define Y_MIN_POS -3
 #define Z_MIN_POS 0
-#define X_MAX_POS (X_BED_SIZE + 3)
-#define Y_MAX_POS (Y_BED_SIZE + 3)
+#define X_MAX_POS X_BED_SIZE
+#define Y_MAX_POS Y_BED_SIZE
 #define Z_MAX_POS 380 // = 400 mm - 20 mm headroom
 //#define I_MIN_POS 0
 //#define I_MAX_POS 50
@@ -1969,7 +1980,7 @@
     #define ABL_BILINEAR_SUBDIVISION
     #if ENABLED(ABL_BILINEAR_SUBDIVISION)
       // Number of subdivisions between probe points
-      #define BILINEAR_SUBDIVISIONS 2
+      #define BILINEAR_SUBDIVISIONS 3
     #endif
 
   #endif
@@ -2090,8 +2101,8 @@
 #define Z_SAFE_HOMING
 
 #if ENABLED(Z_SAFE_HOMING)
-  #define Z_SAFE_HOMING_X_POINT X_CENTER  // X point for Z homing
-  #define Z_SAFE_HOMING_Y_POINT Y_CENTER  // Y point for Z homing
+  #define Z_SAFE_HOMING_X_POINT 150 //X_CENTER  // X point for Z homing
+  #define Z_SAFE_HOMING_Y_POINT 150 //Y_CENTER  // Y point for Z homing
 #endif
 
 // Homing speeds (linear=mm/min, rotational=°/min)
